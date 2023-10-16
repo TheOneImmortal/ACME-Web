@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  font-family: "Microsoft YaHei", 微软雅黑, "MicrosoftJhengHei", 华文细黑, STHeiti, MingLiu, sans-serif;
+}
+
+html,
+body,
+.main {
+  word-spacing: 1px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  min-width: 250px;
+  user-select: none;
+  -webkit-user-select: none;
+  background-color: #fff;
+}
+
+html {
+  font-size: 88px;
+}
+
+body {
+  font-size: .24rem;
+  position: relative;
+}
+
+input {
+  outline: none;
+}

@@ -1,0 +1,71 @@
+<script setup lang="ts">
+import { ref, provide, computed } from 'vue'
+import EmployeePage from './page/EmployeePage.vue'
+import WelcomePage from './page/WelcomePage.vue'
+
+
+//#region 颜色
+const text_color = ref('#ffffff')
+const main_color = ref('#1e90ff')
+const auxiliary_color = ref('#70a1ff')
+const main_color2 = ref('#ff4757')
+const auxiliary_color2 = ref('#ff6b81')
+const bk_color = ref('#ffffff')
+const grey_color = ref('#ECECEC')
+const dark_grey_color = ref('#b3b3b3')
+//#endregion
+//#region 用户信息
+const user_name = ref('')
+const is_login = ref(false)
+const is_admin = ref(false)
+const page_state = ref(0)//0:未登录 1:员工 2:管理员
+//#endregion
+
+//#region 导出全局变量
+provide('text_color', text_color)
+provide('main_color', computed(() => !(is_admin.value) ? main_color.value : main_color2.value))
+provide('auxiliary_color', computed(() => !(is_admin.value) ? auxiliary_color.value : auxiliary_color2.value))
+provide('main_color2', computed(() => (!is_admin.value) ? main_color2.value : main_color.value))
+provide('auxiliary_color2', computed(() => !(is_admin.value) ? auxiliary_color2.value : auxiliary_color.value))
+provide('bk_color', bk_color)
+provide('grey_color', grey_color)
+provide('dark_grey_color', dark_grey_color)
+provide('user_name', user_name)
+provide('is_login', is_login)
+provide('is_admin', is_admin)
+provide('page_state', page_state)
+//#endregion
+
+
+const is_ready_to_login = ref(false)
+
+
+function click_userhead() {
+  switch (page_state.value) {
+    case 0:
+      is_ready_to_login.value = true
+  }
+}
+
+function update_name(s: string) {
+  user_name.value = s
+}
+
+const items = ref([{ name: 'name', prompt: '用户名' }, { name: 'password', prompt: '密码' }])
+const items2 = ref([{ name: 'name', prompt: '用户名' }, { name: 'password', prompt: '密码' }, { name: 'id', prompt: '身份证号' }])
+
+
+</script>
+
+<template>
+  <WelcomePage v-if="page_state == 0" />
+  <EmployeePage v-else-if="page_state == 1" />
+  <EmployeePage v-else-if="page_state == 2" />
+</template>
+
+<style>
+.main {
+  display: flex;
+  flex-direction: column;
+}
+</style>
