@@ -2,13 +2,15 @@
 import { Ref, inject, ref } from 'vue'
 
 
-const props = defineProps<{
-  type: string
-  pattern: string
+const props = withDefaults(defineProps<{
+  type?: string
+  pattern?: string
   prompt: string
   value: string
-}>()
-
+  step?: string
+  symbol?: string
+  enable?: boolean
+}>(), { type: 'text', pattern: '*', step: '1', symbol: '', enable: true })
 
 const emits = defineEmits<{
   input_update: [string]
@@ -30,18 +32,19 @@ const dark_grey_color = inject<Ref<string>>('dark_grey_color')
 
 
 <template>
-  <div class="wrapper">
-    <div class="item">
-      <input :type="type" :pattern="pattern" :required="value.length > 0" :value="value"
-        @input="$emit('input_update', (<HTMLInputElement>$event.target).value)" />
+  <div class="bi-wrapper">
+    <div class="bi-item">
+      <input :type="type" :step="step" :pattern="pattern" :required="value.length > 0" :value="value"
+        @input="$emit('input_update', (<HTMLInputElement>$event.target).value)" :disabled="!enable" />
       <label>{{ prompt }}</label>
     </div>
+    <div class="bi-symbol">{{ symbol }}</div>
   </div>
 </template>
 
 
 <style scoped lang="scss">
-.wrapper {
+.bi-wrapper {
   width: 100%;
   padding-top: 27px;
   margin-bottom: 18px;
@@ -50,11 +53,10 @@ const dark_grey_color = inject<Ref<string>>('dark_grey_color')
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
   position: relative;
   font-weight: 300;
 
-  .item {
+  .bi-item {
     position: relative;
     width: 100%;
     display: flex;
@@ -130,6 +132,10 @@ const dark_grey_color = inject<Ref<string>>('dark_grey_color')
     &:has(input:invalid)::after {
       border-bottom: 1px solid v-bind(main_color2);
     }
+  }
+
+  .bi-symbol {
+    color: v-bind(dark_grey_color);
   }
 }
 </style>

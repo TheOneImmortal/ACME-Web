@@ -41,7 +41,6 @@ function clicked() {
   width: 100%;
   height: 100%;
   position: relative;
-  margin: auto;
   //border: 0;
   //outline: none;
   background-color: v-bind(bk_color);

@@ -47,7 +47,7 @@ function im_admin() {
       <BeautifulInput type="password" pattern="[0-9]+" prompt="密码" :value="password"
         @input_update="(arg0) => password = arg0" />
 
-      <DoubleBkButton :is_active="false" @clicked="page_state = 1;">登录</DoubleBkButton>
+      <DoubleBkButton :is_active="false" @clicked="page_state = !is_admin ? 1 : 2">登录</DoubleBkButton>
     </div>
   </div>
 </template>

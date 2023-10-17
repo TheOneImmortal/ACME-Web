@@ -2,6 +2,7 @@
 import { ref, provide, computed } from 'vue'
 import EmployeePage from './page/EmployeePage.vue'
 import WelcomePage from './page/WelcomePage.vue'
+import AdminPage from './page/AdminPage.vue';
 
 
 //#region 颜色
@@ -18,7 +19,8 @@ const dark_grey_color = ref('#b3b3b3')
 const user_name = ref('')
 const is_login = ref(false)
 const is_admin = ref(false)
-const page_state = ref(0)//0:未登录 1:员工 2:管理员
+const employee_type = ref(0) // 0:H 1:S 2:C
+const page_state = ref(0) // 0:未登录 1:员工 2:管理员
 //#endregion
 
 //#region 导出全局变量
@@ -33,23 +35,10 @@ provide('dark_grey_color', dark_grey_color)
 provide('user_name', user_name)
 provide('is_login', is_login)
 provide('is_admin', is_admin)
+provide('employee_type', employee_type)
 provide('page_state', page_state)
 //#endregion
 
-
-const is_ready_to_login = ref(false)
-
-
-function click_userhead() {
-  switch (page_state.value) {
-    case 0:
-      is_ready_to_login.value = true
-  }
-}
-
-function update_name(s: string) {
-  user_name.value = s
-}
 
 const items = ref([{ name: 'name', prompt: '用户名' }, { name: 'password', prompt: '密码' }])
 const items2 = ref([{ name: 'name', prompt: '用户名' }, { name: 'password', prompt: '密码' }, { name: 'id', prompt: '身份证号' }])
@@ -60,7 +49,7 @@ const items2 = ref([{ name: 'name', prompt: '用户名' }, { name: 'password', p
 <template>
   <WelcomePage v-if="page_state == 0" />
   <EmployeePage v-else-if="page_state == 1" />
-  <EmployeePage v-else-if="page_state == 2" />
+  <AdminPage v-else-if="page_state == 2" />
 </template>
 
 <style>
