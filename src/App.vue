@@ -19,7 +19,7 @@ const dark_grey_color = ref('#b3b3b3')
 const user_name = ref('')
 const is_login = ref(false)
 const is_admin = ref(false)
-const employee_type = ref(0) // 0:H 1:S 2:C
+const employee_type = ref(2) // 0:H 1:S 2:C
 const page_state = ref(0) // 0:未登录 1:员工 2:管理员
 //#endregion
 
@@ -38,10 +38,6 @@ provide('is_admin', is_admin)
 provide('employee_type', employee_type)
 provide('page_state', page_state)
 //#endregion
-
-
-const items = ref([{ name: 'name', prompt: '用户名' }, { name: 'password', prompt: '密码' }])
-const items2 = ref([{ name: 'name', prompt: '用户名' }, { name: 'password', prompt: '密码' }, { name: 'id', prompt: '身份证号' }])
 
 
 </script>
