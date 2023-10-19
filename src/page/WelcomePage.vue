@@ -3,6 +3,7 @@ import { Ref, inject, ref } from 'vue'
 import DoubleBkButton from '../components/DoubleBkButton.vue'
 import Logo from '../components/Logo.vue'
 import BeautifulInput from '../components/BeautifulInput.vue';
+import LightingBk from '../components/LightingBk.vue';
 
 
 const text_color = inject<Ref<string>>('text_color')
@@ -62,9 +63,10 @@ function im_admin() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: v-bind(grey_color);
+  // background-color: v-bind(grey_color);
   color: v-bind(text_color);
   font-size: 50px;
+  z-index: 100;
 
   .logo {
     height: 100px;
@@ -76,10 +78,10 @@ function im_admin() {
     padding: 54px 126px 90px 126px;
     background-color: v-bind(bk_color);
     box-shadow: 0px 10px 10px 0px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
-    transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition: all 0.2s $ease-better;
 
     .tab-box {
       position: relative;
@@ -112,7 +114,7 @@ function im_admin() {
         left: 0%;
         bottom: 0;
         background-color: v-bind(main_color);
-        transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        transition: all 0.3s $ease-better;
 
         &.right {
           left: 50%;

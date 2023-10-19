@@ -1,15 +1,26 @@
 <script setup lang="ts">
 import { Ref, inject, ref, watch } from 'vue';
+import axios from 'axios';
 import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ModeTab from '../components/ModeTab.vue';
 import BeautifulInput from '../components/BeautifulInput.vue';
+import FocusCard from '@/components/FocusCard.vue';
 
 
-var main_color = inject<Ref<string>>('main_color')
-var auxiliary_color = inject<Ref<string>>('auxiliary_color')
+const main_color = inject<Ref<string>>('main_color')
+const auxiliary_color = inject<Ref<string>>('auxiliary_color')
+const bk_color = inject<Ref<string>>('bk_color')
+
+const g = axios.create({
+  baseURL: 'http://127.0.0.1:8080/',
+  timeout: 1000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+})
 
 
-var tabs = ref([{
+const tabs = ref([{
   mode: 1,
   name: '添加员工',
 }, {
@@ -20,23 +31,34 @@ var tabs = ref([{
   name: '删除员工',
 }])
 
-var mode = ref(0) // 1: 添加员工 2: 更新员工 3: 删除员工
-var state = ref(0)
-var is_error = ref(false)
-var error_message = ref('')
+const mode = ref(0) // 1: 添加员工 2: 更新员工 3: 删除员工
+const state = ref(0)
+const is_error = ref(false)
+const error_message = ref('')
 
 
 //#region 员工信息
-var employee_name = ref('')
-var employee_type = ref(0) // 0: H 1: S 2: C
-var mailing_address = ref('')
-var SSN = ref('')
-var standard_tax_deduction = ref('')
-var other_tax_deduction = ref('')
-var phone_number = ref('')
-var hourly_wage = ref('') // H
-var wages = ref('') // S/C
-var commission_rate = ref('') // C
+const employee_id = ref('')
+const employee_name = ref('')
+const employee_name_error = ref('')
+const employee_type = ref(0) // 0: H 1: S 2: C
+
+const mailing_address = ref('')
+const mailing_address_error = ref('')
+const SSN = ref('')
+const SSN_error = ref('')
+const standard_tax_deduction = ref('')
+const standard_tax_deduction_error = ref('')
+const other_tax_deduction = ref('')
+const other_tax_deduction_error = ref('')
+const phone_number = ref('')
+const phone_number_error = ref('')
+const hourly_wage = ref('') // H
+const hourly_wage_error = ref('') // H
+const wages = ref('') // S/C
+const wages_error = ref('') // S/C
+const commission_rate = ref('') // C
+const commission_rate_error = ref('') // C
 //#endregion
 
 
@@ -77,49 +99,75 @@ function test_default_employee_info() {
   commission_rate.value = '20'
 }
 
-function check_employee_info() {
+function check_employee_name() {
   if (employee_name.value.length == 0) {
-    error_message.value = '请输入员工姓名'
-    return false
-  }
-  if (mailing_address.value.length == 0) {
-    error_message.value = '请输入邮寄地址'
-    return false
-  }
-  if (SSN.value.length == 0) {
-    error_message.value = '请输入社会安全号码'
-    return false
-  }
-  if (standard_tax_deduction.value.length == 0) {
-    error_message.value = '请输入标准税收扣除'
-    return false
-  }
-  if (other_tax_deduction.value.length == 0) {
-    error_message.value = '请输入其他扣除'
-    return false
-  }
-  if (phone_number.value.length == 0) {
-    error_message.value = '请输入电话号码'
-    return false
-  }
-  if ((employee_type.value == 0 && hourly_wage.value.length == 0)) {
-    error_message.value = '请输入时薪'
-    return false
-  }
-  if ((employee_type.value == 1 && wages.value.length == 0)) {
-    error_message.value = '请输入工资'
-    return false
-  }
-  if ((employee_type.value == 2 && commission_rate.value.length == 0)) {
-    error_message.value = '请输入佣金率'
+    employee_name_error.value = '请输入员工姓名'
     return false
   }
   return true
 }
 
+function check_SSN() {
+  if (SSN.value.length == 0) {
+    SSN_error.value = '请输入员工SSN'
+    return false
+  } else if (SSN.value.length != 9) {
+    SSN_error.value = 'SSN长度应为9位'
+    return false
+  }
+  return true
+}
+
+function check_employee_info() {
+  var is_no_error = true
+  if (!check_employee_name()) {
+    error_message.value = '请检查输入'
+    is_no_error = false
+  }
+  if (mailing_address.value.length == 0) {
+    error_message.value = '请检查输入'
+    mailing_address_error.value = '请输入邮寄地址'
+    is_no_error = false
+  }
+  if (!check_SSN()) {
+    error_message.value = '请检查输入'
+    is_no_error = false
+  }
+  if (standard_tax_deduction.value.length == 0) {
+    error_message.value = '请检查输入'
+    standard_tax_deduction_error.value = '请输入税率'
+    is_no_error = false
+  }
+  if (other_tax_deduction.value.length == 0) {
+    error_message.value = '请检查输入'
+    other_tax_deduction_error.value = '请输入其他扣除'
+    is_no_error = false
+  }
+  if (phone_number.value.length == 0) {
+    error_message.value = '请检查输入'
+    phone_number_error.value = '请输入电话号码'
+    is_no_error = false
+  }
+  if ((employee_type.value == 0 && hourly_wage.value.length == 0)) {
+    error_message.value = '请检查输入'
+    hourly_wage_error.value = '请输入时薪'
+    is_no_error = false
+  }
+  if ((employee_type.value == 1 && wages.value.length == 0)) {
+    error_message.value = '请检查输入'
+    wages_error.value = '请输入工资'
+    is_no_error = false
+  }
+  if ((employee_type.value == 2 && commission_rate.value.length == 0)) {
+    error_message.value = '请检查输入'
+    commission_rate_error.value = '请输入佣金率'
+    is_no_error = false
+  }
+  return is_no_error
+}
+
 function add_employee_button() {
   if (!check_employee_info()) {
-    is_error.value = true
     return
   }
 
@@ -128,15 +176,14 @@ function add_employee_button() {
 
 function update_employee_button() {
   if (!check_employee_info()) {
-    is_error.value = true
     return
   }
 
-  state.value = 5
+  state.value = 4
 }
 
 function delete_employee_button() {
-  state.value = 8
+  state.value = 4
 }
 
 function add_employee_yes_button() {
@@ -145,24 +192,24 @@ function add_employee_yes_button() {
 }
 
 function select_employee_button() {
-  if (employee_name.value.length == 0) {
+  if (employee_id.value.length == 0) {
     error_message.value = '请输入员工ID'
     is_error.value = true
     return
   }
 
-  state.value = 4
+  state.value = 1
   test_default_employee_info()
 }
 
 function select_delete_employee_button() {
-  if (employee_name.value.length == 0) {
+  if (employee_id.value.length == 0) {
     error_message.value = '请输入员工ID'
     is_error.value = true
     return
   }
 
-  state.value = 7
+  state.value = 1
   test_default_employee_info()
 }
 
@@ -172,7 +219,7 @@ function update_employee_yes_button() {
 }
 
 function delete_employee_yes_button() {
-  state.value = 6
+  state.value = 3
   clear_employee_info()
 }
 
@@ -190,7 +237,7 @@ watch(mode, (new_value, old_value) => {
       state.value = 3
       break
     case 3:
-      state.value = 6
+      state.value = 3
       break
   }
 })
@@ -198,169 +245,104 @@ watch(mode, (new_value, old_value) => {
 
 
 <template>
-  <div class="sub-page-wrapper">
-    <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0" />
-
-    <div class="sub-page-content">
-      <div v-if="is_error" class="mode-content">
-        <label class="prompt">错误!</label>
-        <label class="prompt">{{ error_message }}</label>
-        <DoubleBkButton class="yes" :is_active="false" @clicked="is_error = false">确定
-        </DoubleBkButton>
+  <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0">
+    <FocusCard v-if="is_error">
+      <label class="prompt">错误!</label>
+      <label class="prompt">{{ error_message }}</label>
+      <DoubleBkButton class="yes" :is_active="false" @clicked="is_error = false">确定
+      </DoubleBkButton>
+    </FocusCard>
+    <FocusCard v-else-if="state == 1">
+      <BeautifulInput prompt="姓名" :value="employee_name"
+        @input_update="(v) => { employee_name = v; employee_name_error = '' }" :enable="mode != 3"
+        :error="employee_name_error" @input_blur="check_employee_name" />
+      <div class="type-select">
+        <DoubleBkButton :is_active="employee_type == 0" @clicked="employee_type = 0">小时工</DoubleBkButton>
+        <DoubleBkButton :is_active="employee_type == 1" @clicked="employee_type = 1">受薪工</DoubleBkButton>
+        <DoubleBkButton :is_active="employee_type == 2" @clicked="employee_type = 2">委托工</DoubleBkButton>
       </div>
-      <div v-else-if="state == 1" class="mode-content">
-        <BeautifulInput prompt="姓名" :value="employee_name" @input_update="(v) => employee_name = v" />
-        <div class="type-select">
-          <DoubleBkButton :is_active="employee_type == 0" @clicked="employee_type = 0">小时工</DoubleBkButton>
-          <DoubleBkButton :is_active="employee_type == 1" @clicked="employee_type = 1">受薪工</DoubleBkButton>
-          <DoubleBkButton :is_active="employee_type == 2" @clicked="employee_type = 2">委托工</DoubleBkButton>
-        </div>
-        <BeautifulInput prompt="邮寄地址" :value="mailing_address" @input_update="(v) => mailing_address = v" />
-        <BeautifulInput prompt="社会安全号码" :value="SSN" @input_update="(v) => SSN = v" />
-        <BeautifulInput prompt="标准税收扣除" :value="standard_tax_deduction" @input_update="(v) => standard_tax_deduction = v"
-          symbol="元" />
-        <BeautifulInput prompt="其他扣除" :value="other_tax_deduction" @input_update="(v) => other_tax_deduction = v"
-          symbol="元" />
-        <BeautifulInput prompt="电话号码" :value="phone_number" @input_update="(v) => phone_number = v" pattern="[0-9]+" />
-        <BeautifulInput v-if="employee_type == 0" prompt="时薪" :value="hourly_wage" @input_update="(v) => hourly_wage = v"
-          type="number" step="0.01" symbol="元" />
-        <BeautifulInput v-if="employee_type == 1 || employee_type == 2" prompt="工资" :value="wages"
-          @input_update="(v) => wages = v" type="number" step="0.01" symbol="元" />
-        <BeautifulInput v-if="employee_type == 2" prompt="佣金率" :value="commission_rate"
-          @input_update="(v) => commission_rate = v" type="number" step="0.01" symbol="%" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="add_employee_button">添加</DoubleBkButton>
-      </div>
-      <div v-else-if="state == 2" class="mode-content">
-        <label class="prompt">员工ID为:</label>
-        <label class="id">{{ employee_name }}</label>
-        <DoubleBkButton class="yes" :is_active="false" @clicked="add_employee_yes_button">确定
-        </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 3" class="mode-content">
-        <label class="prompt">欲更新员工ID为:</label>
-        <BeautifulInput prompt="姓名" :value="employee_name" @input_update="(v) => employee_name = v" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="select_employee_button">确定
-        </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 4" class="mode-content">
-        <BeautifulInput prompt="姓名" :value="employee_name" @input_update="(v) => employee_name = v" />
-        <div class="type-select">
-          <DoubleBkButton :is_active="employee_type == 0" @clicked="employee_type = 0">小时工</DoubleBkButton>
-          <DoubleBkButton :is_active="employee_type == 1" @clicked="employee_type = 1">受薪工</DoubleBkButton>
-          <DoubleBkButton :is_active="employee_type == 2" @clicked="employee_type = 2">委托工</DoubleBkButton>
-        </div>
-        <BeautifulInput prompt="邮寄地址" :value="mailing_address" @input_update="(v) => mailing_address = v" />
-        <BeautifulInput prompt="社会安全号码" :value="SSN" @input_update="(v) => SSN = v" />
-        <BeautifulInput prompt="标准税收扣除" :value="standard_tax_deduction" @input_update="(v) => standard_tax_deduction = v"
-          symbol="元" />
-        <BeautifulInput prompt="其他扣除" :value="other_tax_deduction" @input_update="(v) => other_tax_deduction = v"
-          symbol="元" />
-        <BeautifulInput prompt="电话号码" :value="phone_number" @input_update="(v) => phone_number = v" pattern="[0-9]+" />
-        <BeautifulInput v-if="employee_type == 0" prompt="时薪" :value="hourly_wage" @input_update="(v) => hourly_wage = v"
-          type="number" step="0.01" symbol="元" />
-        <BeautifulInput v-if="employee_type == 1 || employee_type == 2" prompt="工资" :value="wages"
-          @input_update="(v) => wages = v" type="number" step="0.01" symbol="元" />
-        <BeautifulInput v-if="employee_type == 2" prompt="佣金率" :value="commission_rate"
-          @input_update="(v) => commission_rate = v" type="number" step="0.01" symbol="%" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="update_employee_button">更新</DoubleBkButton>
-      </div>
-      <div v-else-if="state == 5" class="mode-content">
-        <label class="prompt">已更新!</label>
-        <DoubleBkButton class="yes" :is_active="false" @clicked="update_employee_yes_button">确定
-        </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 6" class="mode-content">
-        <label class="prompt">欲删除员工ID为:</label>
-        <BeautifulInput prompt="姓名" :value="employee_name" @input_update="(v) => employee_name = v" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="select_delete_employee_button">确定
-        </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 7" class="mode-content">
-        <BeautifulInput prompt="姓名" :value="employee_name" @input_update="(v) => employee_name = v" :enable="false" />
-        <div class="type-select">
-          <DoubleBkButton :is_active="employee_type == 0">小时工</DoubleBkButton>
-          <DoubleBkButton :is_active="employee_type == 1">受薪工</DoubleBkButton>
-          <DoubleBkButton :is_active="employee_type == 2">委托工</DoubleBkButton>
-        </div>
-        <BeautifulInput prompt="邮寄地址" :value="mailing_address" @input_update="(v) => mailing_address = v"
-          :enable="false" />
-        <BeautifulInput prompt="社会安全号码" :value="SSN" @input_update="(v) => SSN = v" :enable="false" />
-        <BeautifulInput prompt="标准税收扣除" :value="standard_tax_deduction" @input_update="(v) => standard_tax_deduction = v"
-          symbol="元" :enable="false" />
-        <BeautifulInput prompt="其他扣除" :value="other_tax_deduction" @input_update="(v) => other_tax_deduction = v"
-          symbol="元" :enable="false" />
-        <BeautifulInput prompt="电话号码" :value="phone_number" @input_update="(v) => phone_number = v" pattern="[0-9]+"
-          :enable="false" />
-        <BeautifulInput v-if="employee_type == 0" prompt="时薪" :value="hourly_wage" @input_update="(v) => hourly_wage = v"
-          type="number" step="0.01" symbol="元" :enable="false" />
-        <BeautifulInput v-if="employee_type == 1 || employee_type == 2" prompt="工资" :value="wages"
-          @input_update="(v) => wages = v" type="number" step="0.01" symbol="元" :enable="false" />
-        <BeautifulInput v-if="employee_type == 2" prompt="佣金率" :value="commission_rate"
-          @input_update="(v) => commission_rate = v" type="number" step="0.01" symbol="%" :enable="false" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="delete_employee_button">删除</DoubleBkButton>
-      </div>
-      <div v-else-if="state == 8" class="mode-content">
-        <label class="prompt">已删除!</label>
-        <DoubleBkButton class="yes" :is_active="false" @clicked="delete_employee_yes_button">确定
-        </DoubleBkButton>
-      </div>
-    </div>
-  </div>
+      <BeautifulInput prompt="邮寄地址" :value="mailing_address"
+        @input_update="(v) => { mailing_address = v; mailing_address_error = '' }" :enable="mode != 3"
+        :error="mailing_address_error" />
+      <BeautifulInput prompt="SSN" :value="SSN" @input_update="(v) => { SSN = v; SSN_error = '' }" :max_l="9"
+        :enable="mode != 3" :error="SSN_error" @input_blur="check_SSN" />
+      <BeautifulInput prompt="税率" :value="standard_tax_deduction"
+        @input_update="(v) => { standard_tax_deduction = v; standard_tax_deduction_error = '' }" type="number" step="0.01"
+        :min="0" :max="99.99" symbol="%" :enable="mode != 3" :error="standard_tax_deduction_error" />
+      <BeautifulInput prompt="其他扣除" :value="other_tax_deduction"
+        @input_update="(v) => { other_tax_deduction = v; other_tax_deduction_error = '' }" type="number" step="0.01"
+        :min="0" symbol="元" :enable="mode != 3" :error="other_tax_deduction_error" />
+      <BeautifulInput prompt="电话号码" :value="phone_number"
+        @input_update="(v) => { phone_number = v; phone_number_error = '' }" pattern="[0-9]+" :enable="mode != 3"
+        :error="phone_number_error" />
+      <BeautifulInput v-if="employee_type == 0" prompt="时薪" :value="hourly_wage"
+        @input_update="(v) => { hourly_wage = v; hourly_wage_error = '' }" type="number" step="0.01" symbol="元"
+        :enable="mode != 3" :error="hourly_wage_error" />
+      <BeautifulInput v-if="employee_type == 1 || employee_type == 2" prompt="工资" :value="wages"
+        @input_update="(v) => { wages = v; wages_error = '' }" type="number" step="0.01" symbol="元" :enable="mode != 3"
+        :error="wages_error" />
+      <BeautifulInput v-if="employee_type == 2" prompt="佣金率" :value="commission_rate"
+        @input_update="(v) => { commission_rate = v; commission_rate_error = '' }" type="number" step="0.01" symbol="%"
+        :enable="mode != 3" :error="commission_rate_error" />
+      <DoubleBkButton v-if="mode == 1" class="yes" :is_active="false" @clicked="add_employee_button">添加</DoubleBkButton>
+      <DoubleBkButton v-else-if="mode == 2" class="yes" :is_active="false" @clicked="update_employee_button">更新
+      </DoubleBkButton>
+      <DoubleBkButton v-else-if="mode == 3" class="yes" :is_active="false" @clicked="delete_employee_button">删除
+      </DoubleBkButton>
+    </FocusCard>
+    <FocusCard v-else-if="state == 2">
+      <label class="prompt">员工ID为:</label>
+      <label class="id">{{ employee_name }}</label>
+      <DoubleBkButton class="yes" :is_active="false" @clicked="add_employee_yes_button">确定
+      </DoubleBkButton>
+    </FocusCard>
+    <FocusCard v-else-if="state == 3">
+      <label class="prompt">欲{{ mode == 2 ? '更新' : '删除' }}员工ID为:</label>
+      <BeautifulInput prompt="ID" :value="employee_id" @input_update="(v) => employee_id = v" />
+      <DoubleBkButton class="yes" :is_active="false"
+        @clicked="mode == 2 ? select_employee_button() : select_delete_employee_button()">确定
+      </DoubleBkButton>
+    </FocusCard>
+    <FocusCard v-else-if="state == 4">
+      <label class="prompt">已{{ mode == 2 ? '更新' : '删除' }}!</label>
+      <DoubleBkButton class="yes" :is_active="false"
+        @clicked="mode == 2 ? update_employee_yes_button() : delete_employee_yes_button()">确定
+      </DoubleBkButton>
+    </FocusCard>
+  </ModeTab>
 </template>
 
 
 <style scoped lang="scss">
-.sub-page-wrapper {
-  position: relative;
+.type-select {
   display: flex;
-  flex-grow: 1;
+  width: 400px;
+  height: 40px;
+  margin: 20px 0px;
+}
 
-  .sub-page-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+.bi-wrapper {
+  width: 400px;
+}
 
-    .mode-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+.yes {
+  width: 300px;
+  height: 60px;
+}
 
-      .type-select {
-        display: flex;
-        width: 400px;
-        height: 40px;
-      }
+.prompt {
+  font-size: 24px;
+  color: v-bind(auxiliary_color)
+}
 
-      .bi-wrapper {
-        width: 400px;
-      }
+.id {
+  font-size: 64px;
+  color: v-bind(main_color);
+  margin: 50px 0px;
+}
 
-      .yes {
-        width: 300px;
-        height: 60px;
-      }
-
-      .prompt {
-        font-size: 24px;
-        color: v-bind(auxiliary_color)
-      }
-
-      .id {
-        font-size: 64px;
-        color: v-bind(main_color);
-        margin: 50px 0px;
-      }
-
-      .yes {
-        width: 300px;
-        height: 60px;
-      }
-    }
-  }
+.yes {
+  width: 300px;
+  height: 60px;
 }
 </style>

@@ -3,6 +3,7 @@ import { ref, provide, computed } from 'vue'
 import EmployeePage from './page/EmployeePage.vue'
 import WelcomePage from './page/WelcomePage.vue'
 import AdminPage from './page/AdminPage.vue';
+import LightingBk from './components/LightingBk.vue';
 
 
 //#region 颜色
@@ -46,11 +47,13 @@ provide('page_state', page_state)
   <WelcomePage v-if="page_state == 0" />
   <EmployeePage v-else-if="page_state == 1" />
   <AdminPage v-else-if="page_state == 2" />
+  <LightingBk />
 </template>
 
-<style>
+<style lang="scss">
 .main {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 </style>

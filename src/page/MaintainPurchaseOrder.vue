@@ -3,6 +3,7 @@ import { Ref, inject, ref, watch } from 'vue';
 import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ModeTab from '../components/ModeTab.vue';
 import BeautifulInput from '../components/BeautifulInput.vue';
+import FocusCard from '@/components/FocusCard.vue';
 
 
 var main_color = inject<Ref<string>>('main_color')
@@ -29,9 +30,13 @@ var error_message = ref('')
 //#region 订单信息
 var order_id = ref('')
 var contact_person = ref('')
+var contact_person_error = ref('')
 var biling_address = ref('')
+var biling_address_error = ref('')
 var product_name = ref('')
+var product_name_error = ref('')
 var date = ref('')
+var date_error = ref('')
 //#endregion
 
 
@@ -63,28 +68,28 @@ function test_default_order_info() {
 }
 
 function check_order_info() {
+  var is_no_error = true
   if (contact_person.value.length == 0) {
-    error_message.value = '请输入客户姓名'
-    return false
+    contact_person_error.value = '请输入联系人姓名'
+    is_no_error = false
   }
   if (biling_address.value.length == 0) {
-    error_message.value = '请输入账单地址'
-    return false
+    biling_address_error.value = '请输入账单地址'
+    is_no_error = false
   }
   if (product_name.value.length == 0) {
-    error_message.value = '请输入产品'
-    return false
+    product_name_error.value = '请输入产品'
+    is_no_error = false
   }
   if (date.value.length == 0) {
-    error_message.value = '请输入日期'
-    return false
+    date_error.value = '请输入日期'
+    is_no_error = false
   }
-  return true
+  return is_no_error
 }
 
 function add_order_button() {
   if (!check_order_info()) {
-    is_error.value = true
     return
   }
 
@@ -94,15 +99,14 @@ function add_order_button() {
 
 function update_order_button() {
   if (!check_order_info()) {
-    is_error.value = true
     return
   }
 
-  state.value = 5
+  state.value = 4
 }
 
 function delete_order_button() {
-  state.value = 8
+  state.value = 4
 }
 
 function add_order_yes_button() {
@@ -117,7 +121,7 @@ function select_order_button() {
     return
   }
 
-  state.value = 4
+  state.value = 1
   test_default_order_info()
 }
 
@@ -128,7 +132,7 @@ function select_delete_order_button() {
     return
   }
 
-  state.value = 7
+  state.value = 1
   test_default_order_info()
 }
 
@@ -138,7 +142,7 @@ function update_order_yes_button() {
 }
 
 function delete_order_yes_button() {
-  state.value = 6
+  state.value = 3
   clear_order_info()
 }
 
@@ -156,7 +160,7 @@ watch(mode, (new_value, old_value) => {
       state.value = 3
       break
     case 3:
-      state.value = 6
+      state.value = 3
       break
   }
 })
@@ -165,121 +169,86 @@ watch(mode, (new_value, old_value) => {
 
 <template>
   <div class="sub-page-wrapper">
-    <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0" />
-
-    <div class="sub-page-content">
-      <div v-if="is_error" class="mode-content">
+    <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0">
+      <FocusCard v-if="is_error">
         <label class="prompt">错误!</label>
         <label class="prompt">{{ error_message }}</label>
         <DoubleBkButton class="yes" :is_active="false" @clicked="is_error = false">确定
         </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 1" class="mode-content">
-        <BeautifulInput prompt="联系人" :value="contact_person" @input_update="(v) => contact_person = v" />
-        <BeautifulInput prompt="账单地址" :value="biling_address" @input_update="(v) => biling_address = v" />
-        <BeautifulInput prompt="产品" :value="product_name" @input_update="(v) => product_name = v" />
-        <BeautifulInput prompt="日期" :value="date" @input_update="(v) => date = v" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="add_order_button">添加</DoubleBkButton>
-      </div>
-      <div v-else-if="state == 2" class="mode-content">
+      </FocusCard>
+      <FocusCard v-else-if="state == 1">
+        <BeautifulInput prompt="联系人" :value="contact_person"
+          @input_update="(v) => { contact_person = v; contact_person_error = '' }" :enable="mode != 3"
+          :error="contact_person_error" />
+        <BeautifulInput prompt="账单地址" :value="biling_address"
+          @input_update="(v) => { biling_address = v; biling_address_error = '' }" :enable="mode != 3"
+          :error="biling_address_error" />
+        <BeautifulInput prompt="产品" :value="product_name"
+          @input_update="(v) => { product_name = v; product_name_error = '' }" :enable="mode != 3"
+          :error="product_name_error" />
+        <BeautifulInput prompt="日期" :value="date" @input_update="(v) => { date = v; date_error = '' }" :enable="mode != 3"
+          :error="date_error" />
+        <DoubleBkButton v-if="mode == 1" class="yes" :is_active="false" @clicked="add_order_button">添加</DoubleBkButton>
+        <DoubleBkButton v-else-if="mode == 2" class="yes" :is_active="false" @clicked="update_order_button">更新
+        </DoubleBkButton>
+        <DoubleBkButton v-else-if="mode == 3" class="yes" :is_active="false" @clicked="delete_order_button">删除
+        </DoubleBkButton>
+      </FocusCard>
+      <FocusCard v-else-if="state == 2">
         <label class="prompt">订单ID为:</label>
         <label class="id">{{ order_id }}</label>
         <DoubleBkButton class="yes" :is_active="false" @clicked="add_order_yes_button">确定
         </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 3" class="mode-content">
-        <label class="prompt">欲更新订单ID为:</label>
+      </FocusCard>
+      <FocusCard v-else-if="state == 3">
+        <label class="prompt">欲{{ mode == 2 ? '更新' : '删除' }}订单ID为:</label>
         <BeautifulInput prompt="订单ID" :value="order_id" @input_update="(v) => order_id = v" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="select_order_button">确定
+        <DoubleBkButton v-if="mode == 2" class="yes" :is_active="false" @clicked="select_order_button">确定
         </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 4" class="mode-content">
-        <BeautifulInput prompt="联系人" :value="contact_person" @input_update="(v) => contact_person = v" />
-        <BeautifulInput prompt="账单地址" :value="biling_address" @input_update="(v) => biling_address = v" />
-        <BeautifulInput prompt="产品" :value="product_name" @input_update="(v) => product_name = v" />
-        <BeautifulInput prompt="日期" :value="date" @input_update="(v) => date = v" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="update_order_button">添加</DoubleBkButton>
-      </div>
-      <div v-else-if="state == 5" class="mode-content">
-        <label class="prompt">已更新!</label>
-        <DoubleBkButton class="yes" :is_active="false" @clicked="update_order_yes_button">确定
+        <DoubleBkButton v-else-if="mode == 3" class="yes" :is_active="false" @clicked="select_delete_order_button">确定
         </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 6" class="mode-content">
-        <label class="prompt">欲删除订单ID为:</label>
-        <BeautifulInput prompt="订单ID" :value="order_id" @input_update="(v) => order_id = v" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="select_delete_order_button">确定
+      </FocusCard>
+      <FocusCard v-else-if="state == 4">
+        <label class="prompt">已{{ mode == 2 ? '更新' : '删除' }}!</label>
+        <DoubleBkButton v-if="mode == 2" class="yes" :is_active="false" @clicked="update_order_yes_button">确定
         </DoubleBkButton>
-      </div>
-      <div v-else-if="state == 7" class="mode-content">
-        <BeautifulInput prompt="联系人" :value="contact_person" @input_update="(v) => contact_person = v" :enable="false" />
-        <BeautifulInput prompt="账单地址" :value="biling_address" @input_update="(v) => biling_address = v" :enable="false" />
-        <BeautifulInput prompt="产品" :value="product_name" @input_update="(v) => product_name = v" :enable="false" />
-        <BeautifulInput prompt="日期" :value="date" @input_update="(v) => date = v" :enable="false" />
-        <DoubleBkButton class="yes" :is_active="false" @clicked="delete_order_button">删除</DoubleBkButton>
-      </div>
-      <div v-else-if="state == 8" class="mode-content">
-        <label class="prompt">已删除!</label>
-        <DoubleBkButton class="yes" :is_active="false" @clicked="delete_order_yes_button">确定
+        <DoubleBkButton v-else-if="mode == 3" class="yes" :is_active="false" @clicked="delete_order_yes_button">确定
         </DoubleBkButton>
-      </div>
-    </div>
+      </FocusCard>
+    </ModeTab>
   </div>
 </template>
 
 
 <style scoped lang="scss">
-.sub-page-wrapper {
-  position: relative;
+.type-select {
   display: flex;
-  flex-grow: 1;
+  width: 400px;
+  height: 40px;
+}
 
-  .sub-page-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+.bi-wrapper {
+  width: 400px;
+}
 
-    .mode-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+.yes {
+  width: 300px;
+  height: 60px;
+}
 
-      .type-select {
-        display: flex;
-        width: 400px;
-        height: 40px;
-      }
+.prompt {
+  font-size: 24px;
+  color: v-bind(auxiliary_color)
+}
 
-      .bi-wrapper {
-        width: 400px;
-      }
+.id {
+  font-size: 64px;
+  color: v-bind(main_color);
+  margin: 50px 0px;
+}
 
-      .yes {
-        width: 300px;
-        height: 60px;
-      }
-
-      .prompt {
-        font-size: 24px;
-        color: v-bind(auxiliary_color)
-      }
-
-      .id {
-        font-size: 64px;
-        color: v-bind(main_color);
-        margin: 50px 0px;
-      }
-
-      .yes {
-        width: 300px;
-        height: 60px;
-      }
-    }
-  }
+.yes {
+  width: 300px;
+  height: 60px;
 }
 </style>

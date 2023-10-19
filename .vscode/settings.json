@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    "*.html": true,
+    "*.gitignore": true,
+    "node_modules/": true,
+    "package.json": true,
+    "*config.*": true,
+    "env.d.ts": true,
+  }
+}
