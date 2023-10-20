@@ -3,6 +3,7 @@ import { Ref, computed, inject, ref, watch } from 'vue';
 import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ManageEmployee from './ManageEmployee.vue';
 import ModeTab from '../components/ModeTab.vue';
+import ManageReport from './ManageReport.vue';
 
 
 const bk_color = inject<Ref<string>>('bk_color');
@@ -37,6 +38,7 @@ watch(mode, (new_value) => {
   <div class="page-wrapper">
     <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0">
       <ManageEmployee v-if="mode == 1" />
+      <ManageReport v-else-if="mode == 2" />
     </ModeTab>
   </div>
 </template>

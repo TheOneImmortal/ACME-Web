@@ -4,6 +4,8 @@ import DoubleBkButton from '../components/DoubleBkButton.vue'
 import Logo from '../components/Logo.vue'
 import BeautifulInput from '../components/BeautifulInput.vue';
 import LightingBk from '../components/LightingBk.vue';
+import { log } from 'console';
+import Axios from 'axios';
 
 
 const text_color = inject<Ref<string>>('text_color')
@@ -22,6 +24,31 @@ const page_state = inject<Ref<number>>('page_state')
 const user_name = inject<Ref<string>>('user_name')
 const password = ref('')
 
+Axios.defaults.baseURL = '/api'
+function login() {
+  Axios({
+    method: 'post',
+    url: 'administrator/login',
+    data: {
+      username: user_name.value,
+      password: password.value
+    },
+  }).then((response) => {
+    // console.log(response.config);
+    // console.log(response.headers);
+    // console.log(response.status);
+    // console.log(response.statusText);
+    console.log(response.data);
+
+    if (response.data.code == 1) {
+      page_state.value = 2
+    } else {
+      alert('用户名或密码错误')
+    }
+  }).catch(function (error) {
+    console.log(error);
+  });
+}
 
 function im_employee() {
   is_admin.value = false
@@ -48,7 +75,7 @@ function im_admin() {
       <BeautifulInput type="password" pattern="[0-9]+" prompt="密码" :value="password"
         @input_update="(arg0) => password = arg0" />
 
-      <DoubleBkButton :is_active="false" @clicked="page_state = !is_admin ? 1 : 2">登录</DoubleBkButton>
+      <DoubleBkButton :is_active="false" @clicked="login">登录</DoubleBkButton>
     </div>
   </div>
 </template>

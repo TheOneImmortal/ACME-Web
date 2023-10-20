@@ -4,7 +4,7 @@ import axios from 'axios';
 import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ModeTab from '../components/ModeTab.vue';
 import BeautifulInput from '../components/BeautifulInput.vue';
-import FocusCard from '@/components/FocusCard.vue';
+import FocusCard from '../components/FocusCard.vue';
 
 
 const main_color = inject<Ref<string>>('main_color')

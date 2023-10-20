@@ -3,6 +3,7 @@ import { Ref, inject, ref, watch } from 'vue';
 import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ModeTab from '../components/ModeTab.vue';
 import MaintainPurchaseOrder from './MaintainPurchaseOrder.vue';
+import UserReport from './UserReport.vue';
 
 
 var employee_type = inject<Ref<number>>('employee_type');
@@ -37,7 +38,8 @@ watch(mode, (new_value) => {
 <template>
   <div class="page-wrapper">
     <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0">
-      <MaintainPurchaseOrder v-if="mode == 2" />
+      <UserReport v-if="mode == 1" />
+      <MaintainPurchaseOrder v-else-if="mode == 2" />
     </ModeTab>
   </div>
 </template>

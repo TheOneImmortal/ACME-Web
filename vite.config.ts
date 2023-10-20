@@ -21,5 +21,18 @@ export default defineConfig({
         additionalData: `@import "src/assets/main.scss";`
       }
     }
+  },
+  server: {
+    host: '::1',
+    port: 5173,
+    open: true,
+    cors: true,
+    proxy: {
+      '/api': {
+        target: 'http://49.140.98.55:8080/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   }
 })
