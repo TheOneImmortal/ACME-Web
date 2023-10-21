@@ -4,6 +4,7 @@ import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ModeTab from '../components/ModeTab.vue';
 import MaintainPurchaseOrder from './MaintainPurchaseOrder.vue';
 import UserReport from './UserReport.vue';
+import PayWay from './PayWay.vue';
 
 
 var employee_type = inject<Ref<number>>('employee_type');
@@ -40,6 +41,7 @@ watch(mode, (new_value) => {
     <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0">
       <UserReport v-if="mode == 1" />
       <MaintainPurchaseOrder v-else-if="mode == 2" />
+      <PayWay v-else-if="mode == 4" />
     </ModeTab>
   </div>
 </template>

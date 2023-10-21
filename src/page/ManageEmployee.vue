@@ -153,7 +153,7 @@ function check_employee_info() {
     hourly_wage_error.value = '请输入时薪'
     is_no_error = false
   }
-  if ((employee_type.value == 1 && wages.value.length == 0)) {
+  if (((employee_type.value == 1 || employee_type.value == 2) && wages.value.length == 0)) {
     error_message.value = '请检查输入'
     wages_error.value = '请输入工资'
     is_no_error = false

@@ -80,7 +80,8 @@ const projects = ref([        //todo: 从后端get项目列表
           <div>
             <select v-model="selectedProject">
               <option disabled :value="0">请选择项目</option>
-              <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.id }}-{{ project.name }}
+              <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.id }}-{{ project.name
+              }}
               </option>
             </select>
           </div>
@@ -139,67 +140,35 @@ const projects = ref([        //todo: 从后端get项目列表
 }
 
 .picker {
-  /*General*/
-  // --dp-font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, oxygen, ubuntu, cantarell, "Open Sans",
-  //   "Helvetica Neue", sans-serif;
   --dp-border-radius: 8px;
-  /*Configurable border-radius*/
   --dp-cell-border-radius: 50%;
-  /*Specific border radius for the calendar cell*/
   --dp-common-transition: all 1s $ease-better; // TODO: ?
-  /*Generic transition applied on buttons and calendar cells*/
 
-  /*Sizing*/
   --dp-button-height: 32px;
-  /*Size for buttons in overlays*/
   --dp-month-year-row-height: 32px;
-  /*Height of the month-year select row*/
   --dp-month-year-row-button-size: 32px;
-  /*Specific height for the next/previous buttons*/
   --dp-button-icon-height: 20px;
-  /*Icon sizing in buttons*/
   --dp-cell-size: 32px;
-  /*Width and height of calendar cell*/
   --dp-cell-padding: 0px;
-  /*Padding in the cell*/
   --dp-common-padding: 10px; // TODO: ?
-  /*Common padding used*/
   --dp-input-icon-padding: 42px;
-  /*Padding on the left side of the input if icon is present*/
   --dp-input-padding: 0px 30px 1px 0px;
-  /*Padding in the input*/
   --dp-menu-min-width: 260px;
-  /*Adjust the min width of the menu*/
   --dp-action-buttons-padding: 14px 8px;
-  /*Adjust padding for the action buttons in action row*/
   --dp-row-margin: 8px 0px;
-  /*Adjust the spacing between rows in the calendar*/
   --dp-calendar-header-cell-padding: 100px; // TODO: ?
-  /*Adjust padding in calendar header cells*/
   --dp-two-calendars-spacing: 10px; // TODO: ?
-  /*Space between multiple calendars*/
   --dp-overlay-col-padding: 8px;
-  /*Padding in the overlay column*/
   --dp-time-inc-dec-button-size: 36px;
-  /*Sizing for arrow buttons in the time picker*/
   --dp-menu-padding: 18px 18px;
-  /*Menu padding*/
 
-  /*Font sizes*/
   --dp-font-size: 16px;
-  /*Default font-size*/
   --dp-preview-font-size: 18px;
-  /*Font size of the date preview in the action row*/
   --dp-time-font-size: 20px;
-  /*Font size in the time picker*/
 
-  /*Transitions*/
   --dp-animation-duration: 0.2s;
-  /*Transition duration*/
   --dp-menu-appear-transition-timing: $ease-better;
-  /*Timing on menu appear animation*/
   --dp-transition-timing: $ease-better; // TODO: ?
-  /*Timing on slide animations*/
 
   --dp-background-color: #fff;
   --dp-text-color: black;

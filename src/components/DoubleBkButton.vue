@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { Ref, inject, ref } from 'vue'
+import Waiting from './waiting.vue';
 
 
 const props = withDefaults(defineProps<{
   is_active: boolean
   enable?: boolean
   mode?: 'click' | 'switch'
-}>(), { enable: true, mode: 'click' })
+  is_waiting?: boolean
+  width?: string
+  height?: string
+}>(), { enable: true, mode: 'click', is_waiting: false, width: '100%', height: '60px' })
 
 const emits = defineEmits<{
   clicked: []
@@ -31,7 +35,10 @@ function clicked() {
 
 
 <template>
-  <div :class="{ 'dbb-wrapper': true, 'active': is_active, 'enabled': enable, 'switch': mode == 'switch' }"
+  <div v-if="is_waiting" class="dbb-wrapper">
+    <Waiting />
+  </div>
+  <div v-else :class="{ 'dbb-wrapper': true, 'active': is_active, 'enabled': enable, 'switch': mode == 'switch' }"
     @click="clicked">
     <div class="bk2" />
     <div class="bk" />
@@ -45,13 +52,8 @@ function clicked() {
 <style scoped lang="scss">
 .dbb-wrapper {
   position: relative;
-  min-width: 100px;
-  width: 100%;
-  min-height: 50px;
-  height: 100%;
-  //border: 0;
-  //outline: none;
-  // box-shadow: 0px 0px 2px 0px v-bind("main_color + 'aa'");
+  width: v-bind(width);
+  height: v-bind(height);
   display: flex;
   align-items: center;
   justify-content: center;
