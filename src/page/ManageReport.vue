@@ -6,6 +6,7 @@ import DoubleBkButton from '../components/DoubleBkButton.vue';
 import html2pdf from 'html2pdf.js';
 import ModeTab from '../components/ModeTab.vue';
 import FocusCard from '../components/FocusCard.vue';
+import { message } from 'ant-design-vue';
 
 
 const main_color = inject<Ref<string>>('main_color')
@@ -24,15 +25,13 @@ const tabs = ref([{
 const mode = ref(0)
 const date = ref<Date[]>()
 
-const format = (date) => {
-  const day = date.getDate()
-  const month = date.getMonth() + 1
-  const year = date.getFullYear()
-
-  return `${day}/${month}/${year}`
-}
+const pdf_state = ref(false)
 
 function generatePDF() {
+  if (pdf_state.value == false) {
+    message.error('暂无可用的报告');
+    return
+  }
   console.log(1)
   const content = document.getElementById('pdf-content') // 获取要转换为PDF的DOM元素
 
@@ -47,7 +46,7 @@ function generatePDF() {
 
   // html2pdf().from(content).set(pdfOptions).save('D:\\my_report.pdf')
 
-  const filename = `D://my_report.pdf`
+  const filename = `my_report.pdf`
   const blob = new Blob([html2pdf().from(content).set(pdfOptions)], { type: "application/octet-stream" })
   const nav = (window.navigator as any)
   console.log(nav)
@@ -67,8 +66,34 @@ function generatePDF() {
   }
 }
 
+
+function getReport() {
+  let app = document.getElementById('pdf-content');
+  app.innerText = "这里将会出现一个报告"
+  pdf_state.value = true;
+}
+// function onClick (value: any) {
+//   if (value !== 1) {
+//     // 设置DatePicker的开始时间和结束时间
+//     date1.value = new Date(2023, 0, 1); // 2023年1月1日
+//     date2.value = new Date(); // 当天日期
+//   }
+//   if (value===1) {
+//     // 用户选择薪资报告
+//     isDatePickerDisabled.value = true; // 禁用DatePicker
+//     // 还可以设置DatePicker的值为2023年1月1日和当天，类似之前的逻辑
+//   } else {
+//     // 用户选择工作时长报告
+//     isDatePickerDisabled.value = false; // 启用DatePicker
+//   }
+// }
+
 watch(mode, (v) => {
   console.log(v)
+  let app = document.getElementById('pdf-content');
+  if (pdf_state.value == true)
+    app.innerText = ""
+  pdf_state.value = false;
   switch (Math.floor(v)) {
     case 0:
       break;
@@ -97,11 +122,12 @@ watch(mode, (v) => {
           range partial-range six-weeks></VueDatePicker>
       </div>
       <br>
-      <DoubleBkButton :is_active="false" @click="generatePDF">生成报告</DoubleBkButton>
-      <div id="pdf-content">
+      <DoubleBkButton :is_active="false" @click="getReport">生成报告</DoubleBkButton>
+      <div v-show="pdf_state" id="pdf-content">
         <h1>生成PDF示例</h1>
         <p>这是一个可以保存为PDF的DOM元素示例。</p>
       </div>
+      <DoubleBkButton v-show="pdf_state" :is_active="false" @click="generatePDF">保存报告</DoubleBkButton>
     </FocusCard>
   </ModeTab>
 </template>

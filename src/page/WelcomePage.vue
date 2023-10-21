@@ -42,7 +42,7 @@ function admin_login() {
       alert('用户名或密码错误')
     }
   }).catch((error) => {
-    console.log(error);
+    alert(error)
   }).finally(() => {
     if (is_waiting)
       is_waiting.value = false
@@ -65,7 +65,7 @@ function employee_login() {
       alert('用户名或密码错误')
     }
   }).catch((error) => {
-    console.log(error);
+    alert(error)
   }).finally(() => {
     if (is_waiting)
       is_waiting.value = false

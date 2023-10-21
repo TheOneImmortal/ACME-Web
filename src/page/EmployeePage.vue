@@ -5,6 +5,7 @@ import ModeTab from '../components/ModeTab.vue';
 import MaintainPurchaseOrder from './MaintainPurchaseOrder.vue';
 import UserReport from './UserReport.vue';
 import PayWay from './PayWay.vue';
+import TimeCard from './TimeCard.vue';
 
 
 var employee_type = inject<Ref<number>>('employee_type');
@@ -16,10 +17,12 @@ var tabs = ref(
     [{ mode: 1, name: '创建报告' },
     { mode: 3, name: '考勤卡' },
     { mode: 4, name: '选择付款方式', },
+    { mode: 6, name: '修改密码', },
     { mode: 5, name: '退出', },] :
     [{ mode: 1, name: '创建报告' },
     { mode: 2, name: '采购订单' },
     { mode: 4, name: '选择付款方式' },
+    { mode: 6, name: '修改密码', },
     { mode: 5, name: '退出', },])
 
 
@@ -41,6 +44,7 @@ watch(mode, (new_value) => {
     <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0">
       <UserReport v-if="mode == 1" />
       <MaintainPurchaseOrder v-else-if="mode == 2" />
+      <TimeCard v-else-if="mode == 3" />
       <PayWay v-else-if="mode == 4" />
     </ModeTab>
   </div>

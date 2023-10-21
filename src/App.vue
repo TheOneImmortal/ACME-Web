@@ -20,7 +20,7 @@ const dark_grey_color = ref('#b3b3b3')
 const user_name = ref('')
 const is_login = ref(false)
 const is_admin = ref(false)
-const employee_type = ref(2) // 0:H 1:S 2:C
+const employee_type = ref(0) // 0:H 1:S 2:C
 const page_state = ref(0) // 0:未登录 1:员工 2:管理员
 //#endregion
 

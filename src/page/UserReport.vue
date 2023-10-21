@@ -7,6 +7,7 @@ import Dropdown from 'v-dropdown'
 import ModeTab from '../components/ModeTab.vue';
 import FocusCard from '../components/FocusCard.vue';
 import html2pdf from 'html2pdf.js'
+import { message } from 'ant-design-vue';
 
 
 const main_color = inject<Ref<string>>('main_color')
@@ -29,13 +30,15 @@ const tabs = ref([{
   name: '年初至今工资'
 }])
 const date = ref<Date[]>()
+var mode = ref(0);
 
-watch(date, (val) => {
-  console.log(val.at(0))
-  console.log(val[1])
-})
+const pdf_state = ref(false)
 
 function generatePDF() {
+  if (pdf_state.value == false) {
+    message.error('暂无可用的报告');
+    return
+  }
   console.log(1)
   const content = document.getElementById('pdf-content'); // 获取要转换为PDF的DOM元素
 
@@ -49,6 +52,11 @@ function generatePDF() {
 
   html2pdf().from(content).set(pdfOptions).save('my_report.pdf');
 }
+function getReport() {
+  let app = document.getElementById('pdf-content');
+  app.innerText = "这里将会出现一个报告"
+  pdf_state.value = true;
+}
 const format = (date) => {
   // const day = date.getDate();
   // const month = date.getMonth() + 1;
@@ -57,8 +65,22 @@ const format = (date) => {
   // return `${year}/${month}/${day}`;
 }
 
-var mode = ref(0);
 
+
+watch(date, (val) => {
+  console.log(val.at(0))
+  console.log(val[1])
+})
+watch(mode, (val) => {
+  console.log(val)
+  let app = document.getElementById('pdf-content');
+  if (pdf_state.value == true)
+    app.innerText = ""
+  pdf_state.value = false;
+  if (mode == ref(4)) {
+
+  }
+})
 
 const selectedProject = ref(0);
 
@@ -95,11 +117,12 @@ const projects = ref([        //todo: 从后端get项目列表
         </VueDatePicker>
       </div>
       <br>
-      <DoubleBkButton :is_active="false" @click="generatePDF">生成报告</DoubleBkButton>
-      <div id="pdf-content">
+      <DoubleBkButton :is_active="false" @click="getReport">生成报告</DoubleBkButton>
+      <div v-show="pdf_state" id="pdf-content">
         <h1>生成PDF示例</h1>
         <p>这是一个可以保存为PDF的DOM元素示例。</p><!-- 这里添加你想要转换为PDF的内容 -->
       </div>
+      <DoubleBkButton v-if="pdf_state" :is_active="false" @click="generatePDF">生成报告</DoubleBkButton>
     </FocusCard>
   </ModeTab>
 </template>

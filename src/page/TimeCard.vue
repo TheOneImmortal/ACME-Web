@@ -1,0 +1,112 @@
+<script setup lang="ts">
+import { Ref, inject, ref, watch } from 'vue';
+import DoubleBkButton from '../components/DoubleBkButton.vue';
+import FocusCard from '@/components/FocusCard.vue';
+import BeautifulInput from '@/components/BeautifulInput.vue';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import Dropdown from 'v-dropdown'
+
+
+const main_color = inject<Ref<string>>('main_color')
+const grey_color = inject<Ref<string>>('grey_color')
+const dark_grey_color = inject<Ref<string>>('dark_grey_color')
+const bk_color = inject<Ref<string>>('bk_color')
+
+var mode = ref(0)
+var save = ref(0)
+var pay_method = ref(0);
+var commit = ref(0);
+const date = ref<Date[]>()
+const pro_time = ref('');
+const selectedProject = ref(0);
+const projects = ref([        //todo: 从后端get项目列表
+  { id: 1, name: '项目1' },
+  { id: 2, name: '项目2' },
+  { id: 3, name: '项目3' },
+  // 添加更多项目...
+]);
+</script>
+
+<template>
+  <FocusCard>
+    <div class="row">
+      <VueDatePicker class="picker" v-model="date" :disabled=true inline auto-apply :enable-time-picker="false" range
+        partial-range six-weeks></VueDatePicker>
+      <VueDatePicker class="picker" v-model="date" :disabled=true inline auto-apply :enable-time-picker="false" range
+        partial-range six-weeks></VueDatePicker>
+    </div>
+    <label>请选择项目</label>
+    <Dropdown>
+      <template #trigger>
+        <div>
+          <select v-model="selectedProject">
+            <option disabled :value="0">请选择项目</option>
+            <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.id }}-{{ project.name
+            }}
+            </option>
+          </select>
+        </div>
+      </template>
+    </Dropdown>
+    <BeautifulInput prompt="项目时间" type="number" :value="pro_time" @input_update="(arg0) => pro_time = arg0" />
+    <br />
+    <DoubleBkButton :is_active=false @clicked="save = 1">保存</DoubleBkButton>
+    <DoubleBkButton :is_active=false @clicked="commit = 1">提交</DoubleBkButton>
+  </FocusCard>
+</template>
+
+
+<style scoped lang="scss">
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+.picker {
+  --dp-border-radius: 8px;
+  --dp-cell-border-radius: 50%;
+  --dp-common-transition: all 1s $ease-better; // TODO: ?
+
+  --dp-button-height: 32px;
+  --dp-month-year-row-height: 32px;
+  --dp-month-year-row-button-size: 32px;
+  --dp-button-icon-height: 20px;
+  --dp-cell-size: 32px;
+  --dp-cell-padding: 0px;
+  --dp-common-padding: 10px; // TODO: ?
+  --dp-input-icon-padding: 42px;
+  --dp-input-padding: 0px 30px 1px 0px;
+  --dp-menu-min-width: 260px;
+  --dp-action-buttons-padding: 14px 8px;
+  --dp-row-margin: 8px 0px;
+  --dp-calendar-header-cell-padding: 100px; // TODO: ?
+  --dp-two-calendars-spacing: 10px; // TODO: ?
+  --dp-overlay-col-padding: 8px;
+  --dp-time-inc-dec-button-size: 36px;
+  --dp-menu-padding: 18px 18px;
+
+  --dp-font-size: 16px;
+  --dp-preview-font-size: 18px;
+  --dp-time-font-size: 20px;
+
+  --dp-animation-duration: 0.2s;
+  --dp-menu-appear-transition-timing: $ease-better;
+  --dp-transition-timing: $ease-better; // TODO: ?
+
+  --dp-background-color: #fff;
+  --dp-text-color: black;
+  --dp-border-color: v-bind(dark_grey_color);
+  --dp-border-color-hover: v-bind(main_color);
+  --dp-disabled-color: v-bind(grey_color);
+  --dp-success-color: #76d275;
+  --dp-success-color-disabled: #a3d9b1;
+  --dp-icon-color: v-bind(main_color);
+  --dp-danger-color: #ff6f60;
+  --dp-marker-color: #ff6f60;
+  --dp-tooltip-color: #fafafa;
+}
+
+.bi-wrapper {
+  width: 400px;
+}
+</style>
