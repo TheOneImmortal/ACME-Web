@@ -6,6 +6,7 @@ import MaintainPurchaseOrder from './MaintainPurchaseOrder.vue';
 import UserReport from './UserReport.vue';
 import PayWay from './PayWay.vue';
 import TimeCard from './TimeCard.vue';
+import ChangePassword from './ChangePassword.vue';
 
 
 var employee_type = inject<Ref<number>>('employee_type');
@@ -46,6 +47,7 @@ watch(mode, (new_value) => {
       <MaintainPurchaseOrder v-else-if="mode == 2" />
       <TimeCard v-else-if="mode == 3" />
       <PayWay v-else-if="mode == 4" />
+      <ChangePassword v-else-if="mode == 6" />
     </ModeTab>
   </div>
 </template>

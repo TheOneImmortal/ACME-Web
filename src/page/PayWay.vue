@@ -19,6 +19,7 @@ const id = ref('')
       <DoubleBkButton :is_active="pay_method == 1" @clicked="pay_method = 1">邮寄</DoubleBkButton>
       <DoubleBkButton :is_active="pay_method == 2" @clicked="pay_method = 2">直接存款</DoubleBkButton>
     </div>
+    <label v-if="pay_method == 0"><br /> 直接找老板</label>
     <BeautifulInput v-if="pay_method == 1" prompt="邮寄地址" type="text" :value="mail_pos"
       @input_update="(arg0) => mail_pos = arg0" />
     <BeautifulInput v-if="pay_method == 2" prompt="汇款银行" type="text" :value="bank"

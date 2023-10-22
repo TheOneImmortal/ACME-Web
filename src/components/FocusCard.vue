@@ -3,6 +3,7 @@ import { Ref, inject } from 'vue';
 
 
 const main_color = inject<Ref<string>>('main_color');
+const auxiliary_color = inject<Ref<string>>('auxiliary_color');
 const bk_color = inject<Ref<string>>('bk_color');
 </script>
 
@@ -14,7 +15,7 @@ const bk_color = inject<Ref<string>>('bk_color');
 </template>
 
 
-<style scoped lang="scss">
+<style  lang="scss">
 .fc-wrapper {
   padding: 100px 100px;
   margin: auto;
@@ -34,6 +35,11 @@ const bk_color = inject<Ref<string>>('bk_color');
 
   &:has(:focus) {
     border: 1px solid v-bind(main_color);
+  }
+
+  label {
+    font-size: 24px;
+    color: v-bind(main_color)
   }
 }
 </style>

@@ -12,26 +12,24 @@ const grey_color = inject<Ref<string>>('grey_color')
 const dark_grey_color = inject<Ref<string>>('dark_grey_color')
 const bk_color = inject<Ref<string>>('bk_color')
 
-var mode = ref(0)
 var save = ref(0)
-var pay_method = ref(0);
-var commit = ref(0);
-const date = ref<Date[]>()
-const pro_time = ref('');
-const selectedProject = ref(0);
+var commit = ref(0)
+const date = ref([new Date(), new Date()])
+const pro_time = ref('')
+const selectedProject = ref(0)
 const projects = ref([        //todo: 从后端get项目列表
   { id: 1, name: '项目1' },
   { id: 2, name: '项目2' },
   { id: 3, name: '项目3' },
   // 添加更多项目...
-]);
+])
 </script>
 
 <template>
   <FocusCard>
     <div class="row">
       <VueDatePicker class="picker" v-model="date" :disabled=true inline auto-apply :enable-time-picker="false" range
-        partial-range six-weeks></VueDatePicker>
+        partial-range six-weeks :start-date="date[0]" :focus-start-date="true"></VueDatePicker>
       <VueDatePicker class="picker" v-model="date" :disabled=true inline auto-apply :enable-time-picker="false" range
         partial-range six-weeks></VueDatePicker>
     </div>
@@ -48,7 +46,8 @@ const projects = ref([        //todo: 从后端get项目列表
         </div>
       </template>
     </Dropdown>
-    <BeautifulInput prompt="项目时间" type="number" :value="pro_time" @input_update="(arg0) => pro_time = arg0" />
+    <BeautifulInput prompt="工作时间" type="number" :value="pro_time" @input_update="(arg0) => pro_time = arg0" :min="0"
+      step="0.5" />
     <br />
     <DoubleBkButton :is_active=false @clicked="save = 1">保存</DoubleBkButton>
     <DoubleBkButton :is_active=false @clicked="commit = 1">提交</DoubleBkButton>

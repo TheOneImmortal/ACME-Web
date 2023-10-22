@@ -24,12 +24,12 @@ const tabs = ref([{
   name: '项目工作时长'
 }, {
   mode: 3,
-  name: '假期'
+  name: '假期/病假'
 }, {
   mode: 4,
   name: '年初至今工资'
 }])
-const date = ref<Date[]>()
+const date = ref([new Date(), new Date()])
 var mode = ref(0);
 
 const pdf_state = ref(false)
@@ -65,20 +65,15 @@ const format = (date) => {
   // return `${year}/${month}/${day}`;
 }
 
-
-
-watch(date, (val) => {
-  console.log(val.at(0))
-  console.log(val[1])
-})
 watch(mode, (val) => {
-  console.log(val)
   let app = document.getElementById('pdf-content');
   if (pdf_state.value == true)
     app.innerText = ""
   pdf_state.value = false;
-  if (mode == ref(4)) {
-
+  if (mode.value == 4) {
+    var new_date = [new Date(), new Date()]
+    new_date[0].setMonth(0, 1)
+    date.value = new_date
   }
 })
 
@@ -110,10 +105,10 @@ const projects = ref([        //todo: 从后端get项目列表
         </template>
       </Dropdown>
       <br>
-      <label v-if="mode == 2 || mode == 4">请选择范围</label>
+      <label v-if="mode != 4">请选择范围</label>
       <div>
-        <VueDatePicker v-if="mode == 2 || mode == 4" class="picker" v-model="date" :disabled="mode == 4" inline auto-apply
-          :enable-time-picker="false" range partial-range six-weeks>
+        <VueDatePicker class="picker" :disabled="mode == 4" inline auto-apply :enable-time-picker="false" v-model="date"
+          range partial-range six-weeks>
         </VueDatePicker>
       </div>
       <br>

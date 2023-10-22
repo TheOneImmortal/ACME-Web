@@ -7,6 +7,7 @@ import html2pdf from 'html2pdf.js';
 import ModeTab from '../components/ModeTab.vue';
 import FocusCard from '../components/FocusCard.vue';
 import { message } from 'ant-design-vue';
+import BeautifulInput from '../components/BeautifulInput.vue';
 
 
 const main_color = inject<Ref<string>>('main_color')
@@ -26,6 +27,8 @@ const mode = ref(0)
 const date = ref<Date[]>()
 
 const pdf_state = ref(false)
+
+const employee_id = ref('')
 
 function generatePDF() {
   if (pdf_state.value == false) {
@@ -121,6 +124,7 @@ watch(mode, (v) => {
         <VueDatePicker class="picker" v-model="date" :disabled="mode == 2" inline auto-apply :enable-time-picker="false"
           range partial-range six-weeks></VueDatePicker>
       </div>
+      <BeautifulInput :value="employee_id" @input="(arg0) => employee_id = arg0" prompt="欲查询员工ID" />
       <br>
       <DoubleBkButton :is_active="false" @click="getReport">生成报告</DoubleBkButton>
       <div v-show="pdf_state" id="pdf-content">
