@@ -24,12 +24,12 @@ export default defineConfig({
   },
   server: {
     host: '::1',
-    port: 5173,
+    port: /* 您希望使用的端口 */,
     open: true,
     cors: true,
     proxy: {
       '/api': {
-        target: 'http://49.140.98.55:8080/',
+        target: /* 您使用的后端地址与端口 */,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

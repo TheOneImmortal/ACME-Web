@@ -1,40 +1,38 @@
 # acme管理系统
 
-This template should help get you started developing with Vue 3 in Vite.
+这是一个非常“强大”的管理系统前端！
 
-## Recommended IDE Setup
+## 怎么启动？
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+如果你想要使用，请按照以下步骤操作
 
-## Type Support for `.vue` Imports in TS
+### 1. 请确保您下载了vscode、nodejs，以下步骤假定您具有以上两个软件进行操作
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+[VSCode](https://www.lmstfy.icu/Baidu/?q=dnNjb2Rl)的安装方法
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+[NodeJS](https://www.lmstfy.icu/Baidu/?q=Tm9kZUpT)的安装方法
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+### 2. 在目标文件夹下运行以下指令
 
-## Customize configuration
+#### 作用：安装必要的库到文件夹下，可能需要一定时间
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+#### 另外：2023-10时以下库仍可使用，将来如果不可使用，请自行修改项目代码
 
 ```sh
-npm install
+npm i vue
+npm i axios
+npm i @vuepic/vue-datepicker
+npm i html2pdf.js
+npm i ant-design-vue
+npm i v-dropdown
 ```
 
-### Compile and Hot-Reload for Development
+### 3. 制作后端，或者您可以下载本前端对应的后端代码
+
+### 4. 修改 vite.config.ts 文件的 目标端口、后端地址 字段
+
+### 5. 在目标文件夹下运行以下指令以启动项目
 
 ```sh
 npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
 ```
