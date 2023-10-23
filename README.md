@@ -36,3 +36,9 @@ npm i v-dropdown
 ```sh
 npm run dev
 ```
+
+## 长什么样？
+
+![Alt text](image-1.png)
+![Alt text](image.png)
+![Alt text](image-2.png)
