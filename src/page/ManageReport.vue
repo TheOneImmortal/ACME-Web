@@ -8,7 +8,7 @@ import ModeTab from '../components/ModeTab.vue';
 import FocusCard from '../components/FocusCard.vue';
 import { message } from 'ant-design-vue';
 import BeautifulInput from '../components/BeautifulInput.vue';
-
+import axios from 'axios';
 
 const main_color = inject<Ref<string>>('main_color')
 const grey_color = inject<Ref<string>>('grey_color')
@@ -29,6 +29,29 @@ const date = ref<Date[]>()
 const pdf_state = ref(false)
 
 const employee_id = ref('')
+
+function request_employee_by_username(){
+  return axios({
+    method: 'get',
+    url: 'employee/username',
+    params: {
+      username: employee_id.value
+    }
+  })
+}
+function request_report_employee(){
+  return axios({
+    method: 'get',
+    url: 'report/type',
+    params: {
+      type: mode.value == 2 ? 4 : mode.value,
+      username: employee_id.value,
+      start_date: date.value[0],
+      end_date: date.value[1],
+      project_id: -1
+    }
+  })
+}
 
 function generatePDF() {
   if (pdf_state.value == false) {
@@ -71,9 +94,26 @@ function generatePDF() {
 
 
 function getReport() {
-  let app = document.getElementById('pdf-content');
-  app.innerText = "这里将会出现一个报告"
-  pdf_state.value = true;
+  request_employee_by_username().then(
+    (response) => {
+      if (response.data.code == 1){
+        request_report_employee().then(
+          (response) => {
+            if (response.data.code == 1){
+              console.log(response.data);
+              let app = document.getElementById('pdf-content');
+              app.innerText = response.data.data;
+              pdf_state.value = true;
+            }
+          }
+        )
+      } else {
+        alert("查询用户不存在")
+      }
+    }
+  )
+
+
 }
 // function onClick (value: any) {
 //   if (value !== 1) {
@@ -124,7 +164,7 @@ watch(mode, (v) => {
         <VueDatePicker class="picker" v-model="date" :disabled="mode == 2" inline auto-apply :enable-time-picker="false"
           range partial-range six-weeks></VueDatePicker>
       </div>
-      <BeautifulInput :value="employee_id" @input="(arg0) => employee_id = arg0" prompt="欲查询员工ID" />
+      <BeautifulInput :value="employee_id" @input_update="(arg0) => employee_id = arg0" prompt="欲查询员工用户名" />
       <br>
       <DoubleBkButton :is_active="false" @click="getReport">生成报告</DoubleBkButton>
       <div v-show="pdf_state" id="pdf-content">

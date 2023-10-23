@@ -5,13 +5,14 @@ import FocusCard from '@/components/FocusCard.vue';
 import BeautifulInput from '@/components/BeautifulInput.vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import Dropdown from 'v-dropdown'
+import axios from 'axios';
 
 
 const main_color = inject<Ref<string>>('main_color')
 const grey_color = inject<Ref<string>>('grey_color')
 const dark_grey_color = inject<Ref<string>>('dark_grey_color')
 const bk_color = inject<Ref<string>>('bk_color')
-
+const user_name = inject<Ref<string>>('user_name')
 var save = ref(0)
 var commit = ref(0)
 const date = ref([new Date(), new Date()])
@@ -23,6 +24,27 @@ const projects = ref([        //todo: 从后端get项目列表
   { id: 3, name: '项目3' },
   // 添加更多项目...
 ])
+
+function submit(){
+  axios({
+    method: 'get',
+    url: 'attendance/add',
+    params: {
+      username: user_name.value,
+      working_hour: pro_time.value,
+    },
+  }).then(
+    (response) => {
+      if(response.data.code == 1){
+        alert("上传成功")
+      } else {
+        alert("今日工时已保存")
+      }
+    }
+    
+  )
+}
+
 </script>
 
 <template>
@@ -33,24 +55,11 @@ const projects = ref([        //todo: 从后端get项目列表
       <VueDatePicker class="picker" v-model="date" :disabled=true inline auto-apply :enable-time-picker="false" range
         partial-range six-weeks></VueDatePicker>
     </div>
-    <label>请选择项目</label>
-    <Dropdown>
-      <template #trigger>
-        <div>
-          <select v-model="selectedProject">
-            <option disabled :value="0">请选择项目</option>
-            <option v-for="project in projects" :key="project.id" :value="project.id">{{ project.id }}-{{ project.name
-            }}
-            </option>
-          </select>
-        </div>
-      </template>
-    </Dropdown>
+    <label>今日工作时间为</label>
     <BeautifulInput prompt="工作时间" type="number" :value="pro_time" @input_update="(arg0) => pro_time = arg0" :min="0"
       step="0.5" />
     <br />
-    <DoubleBkButton :is_active=false @clicked="save = 1">保存</DoubleBkButton>
-    <DoubleBkButton :is_active=false @clicked="commit = 1">提交</DoubleBkButton>
+    <DoubleBkButton :is_active=false @clicked=submit>提交</DoubleBkButton>
   </FocusCard>
 </template>
 

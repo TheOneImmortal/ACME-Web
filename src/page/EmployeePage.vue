@@ -29,10 +29,18 @@ var tabs = ref(
 
 var mode = ref(0); // 1: 创建报告 2: 采购订单 3:考勤卡 4:选择付款方式
 
+import axios from 'axios';
+function logout(){//添加员工登出时的请求处理
+  console.log("logouting")
+  axios.post('administrator/logout')
+  .then((response) => {
+  })
+}
 
 watch(mode, (new_value) => {
   switch (new_value) {
     case 5:
+      logout()
       page_state.value = 0
       break
   }

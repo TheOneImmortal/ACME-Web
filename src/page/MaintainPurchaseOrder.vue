@@ -4,7 +4,7 @@ import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ModeTab from '../components/ModeTab.vue';
 import BeautifulInput from '../components/BeautifulInput.vue';
 import FocusCard from '@/components/FocusCard.vue';
-
+import axios from 'axios';
 
 var main_color = inject<Ref<string>>('main_color')
 var auxiliary_color = inject<Ref<string>>('auxiliary_color')
@@ -35,10 +35,12 @@ var biling_address = ref('')
 var biling_address_error = ref('')
 var product_name = ref('')
 var product_name_error = ref('')
+var price = ref('')
+var price_error = ref('')
 var date = ref('')
 var date_error = ref('')
 //#endregion
-
+const user_name = inject<Ref<string>>('user_name')
 
 function add_order() {
   // state.value = 1
@@ -60,11 +62,12 @@ function clear_order_info() {
   date.value = ''
 }
 
-function test_default_order_info() {
-  contact_person.value = '小明'
-  biling_address.value = '吉大'
-  product_name.value = '毕设真题'
-  date.value = '13月1日'
+function test_default_order_info(data) {
+  contact_person.value = data.contact_person
+  biling_address.value = data.biling_address
+  product_name.value = data.product_name
+  date.value = data.create_date
+  price.value = data.price
 }
 
 function check_order_info() {
@@ -75,6 +78,10 @@ function check_order_info() {
   }
   if (biling_address.value.length == 0) {
     biling_address_error.value = '请输入账单地址'
+    is_no_error = false
+  }
+  if (price.value.length == 0) {
+    price_error.value = '请输入价格'
     is_no_error = false
   }
   if (product_name.value.length == 0) {
@@ -88,13 +95,42 @@ function check_order_info() {
   return is_no_error
 }
 
+axios.defaults.baseURL = '/api'
+function change_employee(){
+  return axios({
+    method: mode.value == 1 ? 'post' : mode.value == 2 ? 'put' : 'delete',
+    url: 'order/change',
+    data: {
+      employee_id : user_name.value,
+      contact_person: contact_person.value,
+      biling_address: biling_address.value,
+      product_name: product_name.value,
+      create_date: date.value,
+      price: price.value
+    }
+  })
+}
+function request_order_by_id(){
+  return axios({
+    method: 'get',
+    url: 'order/id',
+    params: {
+      id: order_id.value
+    }
+  })
+}
+
 function add_order_button() {
   if (!check_order_info()) {
     return
   }
-
-  order_id.value = Math.floor(Math.random() * 100).toString()
-  state.value = 2
+  change_employee().then((response) => {
+    if(response.data.code == 1){
+      order_id.value = response.data.data.id
+      state.value = 2
+    }
+  })
+  
 }
 
 function update_order_button() {
@@ -120,9 +156,14 @@ function select_order_button() {
     is_error.value = true
     return
   }
+  request_order_by_id().then((response) => {
+    if(response.data.code == 1){
+      state.value = 1
+      test_default_order_info(response.data.data)
+    }
+  })
 
-  state.value = 1
-  test_default_order_info()
+  
 }
 
 function select_delete_order_button() {
@@ -131,9 +172,12 @@ function select_delete_order_button() {
     is_error.value = true
     return
   }
-
-  state.value = 1
-  test_default_order_info()
+  request_order_by_id().then((response) => {
+    if(response.data.code == 1){
+      state.value = 1
+      test_default_order_info(response.data.data)
+    }
+  })
 }
 
 function update_order_yes_button() {
@@ -186,6 +230,9 @@ watch(mode, (new_value, old_value) => {
         <BeautifulInput prompt="产品" :value="product_name"
           @input_update="(v) => { product_name = v; product_name_error = '' }" :enable="mode != 3"
           :error="product_name_error" />
+        <BeautifulInput prompt="总价格" :value="price"
+          @input_update="(v) => { price = v; price_error = '' }" :enable="mode != 3"
+          :error="price_error" />
         <BeautifulInput prompt="日期" :value="date" @input_update="(v) => { date = v; date_error = '' }" :enable="mode != 3"
           :error="date_error" />
         <DoubleBkButton v-if="mode == 1" class="yes" :is_active="false" @clicked="add_order_button">添加</DoubleBkButton>

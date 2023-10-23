@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Ref, computed, inject, ref, watch } from 'vue';
-import DoubleBkButton from '../components/DoubleBkButton.vue';
 import ManageEmployee from './ManageEmployee.vue';
 import ModeTab from '../components/ModeTab.vue';
 import ManageReport from './ManageReport.vue';
-
+import WelcomePage from './WelcomePage.vue'
+import axios from 'axios';
 
 const bk_color = inject<Ref<string>>('bk_color');
 const page_state = inject<Ref<number>>('page_state');
@@ -23,10 +23,17 @@ const tabs = ref([{
 
 const mode = ref(0); // 1: 管理员工 2: 创建报告
 
+function logout(){//添加员工登出时的请求处理
+  console.log("logouting")
+  axios.post('administrator/logout')
+  .then((response) => {
+  })
+}
 
 watch(mode, (new_value) => {
   switch (new_value) {
     case 3:
+      logout()//添加员工登出时的请求处理
       page_state.value = 0
       break
   }
@@ -36,7 +43,7 @@ watch(mode, (new_value) => {
 
 <template>
   <div class="page-wrapper">
-    <ModeTab :modes="tabs" @mode_update="(arg0) => mode = arg0">
+    <ModeTab :modes="tabs" @mode_update="(arg0) => (mode = arg0)">
       <ManageEmployee v-if="mode == 1" />
       <ManageReport v-else-if="mode == 2" />
     </ModeTab>

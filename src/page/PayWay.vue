@@ -1,11 +1,52 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { Ref, inject, ref, watch } from 'vue'
 import DoubleBkButton from '../components/DoubleBkButton.vue';
 import FocusCard from '@/components/FocusCard.vue';
 import BeautifulInput from '@/components/BeautifulInput.vue';
+import axios from 'axios';
+import { userInfo } from 'os';
 var mode = ref(0)
 var pay_method = ref(0);
 var commit = ref(0);
+const user_name = inject<Ref<string>>('user_name')
+
+axios.defaults.baseURL = '/api'
+function change_employee(){
+  axios({
+    method: 'put',
+    url: 'employee/change',
+    data: {
+      username: user_name.value,
+      payment:pay_method.value,
+      mailing_address: pay_method.value == 0 || pay_method.value == 2 ? null : mail_pos.value,
+      bank: pay_method.value == 0 || pay_method.value == 1 ? null : bank.value,
+      bank_id: pay_method.value == 0 || pay_method.value == 1 ? null : id.value,
+    },
+  }).then((response) => {
+    if(response.data.code == 1){
+      alert("修改成功")
+    }
+  })
+}
+
+function request_employee_by_username(){
+  axios({
+    method: 'get',
+    url: 'employee/username',
+    params: {
+      username: user_name.value
+    }
+  }).then((response) => {
+    if(response.data.code == 1){
+      console.log(response.data.data)
+      pay_method.value = response.data.data.payment,
+      mail_pos.value = response.data.data.mailing_address == null ? "" : response.data.data.mailing_address
+      bank.value = response.data.data.bank == null ? "" : response.data.data.bank
+      id.value = response.data.data.bank_id == null ? "" : response.data.data.bank_id
+    }
+  })
+}
+request_employee_by_username()
 
 const mail_pos = ref('')
 const bank = ref('')
@@ -26,7 +67,7 @@ const id = ref('')
       @input_update="(arg0) => bank = arg0" />
     <BeautifulInput v-if="pay_method == 2" prompt="账号" type="text" :value="id" @input_update="(arg0) => id = arg0" />
     <br />
-    <DoubleBkButton :is_active=false @clicked="commit = 1">提交</DoubleBkButton>
+    <DoubleBkButton :is_active=false @clicked="change_employee">提交</DoubleBkButton>
   </FocusCard>
 </template>
 

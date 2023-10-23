@@ -1,19 +1,36 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { Ref, inject, ref, watch } from 'vue'
 import DoubleBkButton from '../components/DoubleBkButton.vue';
 import FocusCard from '@/components/FocusCard.vue';
 import BeautifulInput from '@/components/BeautifulInput.vue';
-
-
+import axios from 'axios';
+const user_name = inject<Ref<string>>('user_name')
 const new_password = ref('')
 const repeat_new_password = ref('')
 
 const state = ref(0)
 
 function ChangePassword() {
-  state.value = 1
+  if(new_password.value != repeat_new_password.value){
+    alert("密码不一致")
+    return
+  }
+  axios({
+    method: 'put',
+    url: 'employee/change',
+    data: {
+      username: user_name.value,
+      password: new_password.value,
+    },
+  }).then((response) => {
+    if(response.data.code == 1){
+      state.value = 1
+    }
+  })
 }
 </script>
+
+
 
 <template>
   <FocusCard>

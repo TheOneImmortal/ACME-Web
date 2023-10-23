@@ -14,7 +14,21 @@ const main_color = inject<Ref<string>>('main_color')
 const grey_color = inject<Ref<string>>('grey_color')
 const dark_grey_color = inject<Ref<string>>('dark_grey_color')
 const bk_color = inject<Ref<string>>('bk_color')
-
+const user_name = inject<Ref<string>>('user_name')
+import axios from 'axios';
+function request_report_employee(){
+  return axios({
+    method: 'get',
+    url: 'report/type',
+    params: {
+      type: mode.value = mode.value,
+      username: user_name.value,
+      start_date: date.value[0],
+      end_date: date.value[1],
+      project_id: selectedProject.value
+    }
+  })
+}
 
 const tabs = ref([{
   mode: 1,
@@ -53,9 +67,16 @@ function generatePDF() {
   html2pdf().from(content).set(pdfOptions).save('my_report.pdf');
 }
 function getReport() {
-  let app = document.getElementById('pdf-content');
-  app.innerText = "这里将会出现一个报告"
-  pdf_state.value = true;
+    request_report_employee().then(
+      (response) => {
+          if (response.data.code == 1){
+            console.log(response.data);
+            let app = document.getElementById('pdf-content');
+            app.innerText = response.data.data;
+          pdf_state.value = true;
+        }
+      }
+    )
 }
 const format = (date) => {
   // const day = date.getDate();
@@ -70,6 +91,17 @@ watch(mode, (val) => {
   if (pdf_state.value == true)
     app.innerText = ""
   pdf_state.value = false;
+  if(mode.value == 2){
+    get_project().then(
+      (response) => {
+        if (response.data.code == 1){
+          console.log(response.data.data)
+          projects.value = response.data.data
+        }
+      }
+    )
+  }
+
   if (mode.value == 4) {
     var new_date = [new Date(), new Date()]
     new_date[0].setMonth(0, 1)
@@ -78,6 +110,16 @@ watch(mode, (val) => {
 })
 
 const selectedProject = ref(0);
+
+function get_project(){
+  return axios({
+    method: 'get',
+    url: 'report/allproject',
+    params:{
+      username: user_name.value
+    }
+  })
+}
 
 const projects = ref([        //todo: 从后端get项目列表
   { id: 1, name: '项目1' },
@@ -117,7 +159,7 @@ const projects = ref([        //todo: 从后端get项目列表
         <h1>生成PDF示例</h1>
         <p>这是一个可以保存为PDF的DOM元素示例。</p><!-- 这里添加你想要转换为PDF的内容 -->
       </div>
-      <DoubleBkButton v-if="pdf_state" :is_active="false" @click="generatePDF">生成报告</DoubleBkButton>
+      <DoubleBkButton v-if="pdf_state" :is_active="false" @click="generatePDF">保存报告</DoubleBkButton>
     </FocusCard>
   </ModeTab>
 </template>

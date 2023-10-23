@@ -3,7 +3,7 @@ import { Ref, inject, ref } from 'vue'
 import DoubleBkButton from '../components/DoubleBkButton.vue'
 import Logo from '../components/Logo.vue'
 import BeautifulInput from '../components/BeautifulInput.vue';
-import Axios from 'axios';
+import axios from 'axios';
 
 
 const text_color = inject<Ref<string>>('text_color')
@@ -17,25 +17,23 @@ const dark_grey_color = inject<Ref<string>>('dark_grey_color')
 
 const is_admin = inject<Ref<boolean>>('is_admin')
 const page_state = inject<Ref<number>>('page_state')
-
+const employee_type = inject<Ref<number>>('employee_type')
 
 const user_name = inject<Ref<string>>('user_name')
 const password = ref('')
 
 const is_waiting = ref(false)
 
-Axios.defaults.baseURL = '/api'
-Axios.defaults.timeout = 5000
+axios.defaults.baseURL = '/api'
+axios.defaults.timeout = 5000
 function admin_login() {
-  page_state.value = 2
   is_waiting.value = true
-  Axios.post(
+  axios.post(
     'administrator/login', {
     username: user_name.value,
     password: password.value
   }).then((response) => {
     console.log(response.data);
-
     if (response.data.code == 1) {
       page_state.value = 2
     } else {
@@ -50,16 +48,17 @@ function admin_login() {
 }
 
 function employee_login() {
-  page_state.value = 1
   is_waiting.value = true
-  Axios.post(
+  axios.post(
     'employee/login', {
     username: user_name.value,
     password: password.value
   }).then((response) => {
     console.log(response.data);
-
+    console.log(response.data.data);
     if (response.data.code == 1) {
+      employee_type.value = response.data.data //根据员工类型更改界面
+      
       page_state.value = 1
     } else {
       alert('用户名或密码错误')
@@ -101,7 +100,7 @@ function im_admin() {
         <div :class="{ line: true, right: is_admin }"></div>
       </div>
       <BeautifulInput type="text" pattern="*" prompt="姓名" :value="user_name" @input_update="(arg0) => user_name = arg0" />
-      <BeautifulInput type="password" pattern="[0-9]+" prompt="密码" :value="password"
+      <BeautifulInput type="password" pattern="*" prompt="密码" :value="password"
         @input_update="(arg0) => password = arg0" />
 
       <DoubleBkButton :is_active="false" @clicked="login" :is_waiting="is_waiting">登录</DoubleBkButton>

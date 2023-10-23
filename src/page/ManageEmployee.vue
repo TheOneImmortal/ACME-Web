@@ -11,13 +11,7 @@ const main_color = inject<Ref<string>>('main_color')
 const auxiliary_color = inject<Ref<string>>('auxiliary_color')
 const bk_color = inject<Ref<string>>('bk_color')
 
-const g = axios.create({
-  baseURL: 'http://127.0.0.1:8080/',
-  timeout: 1000,
-  headers: {
-    'Content-Type': 'application/json',
-  }
-})
+
 
 
 const tabs = ref([{
@@ -87,16 +81,18 @@ function clear_employee_info() {
   commission_rate.value = ''
 }
 
-function test_default_employee_info() {
-  employee_type.value = Math.floor(Math.random() * 100) % 3
-  mailing_address.value = '吉大'
-  SSN.value = '1234'
-  standard_tax_deduction.value = '5000'
-  other_tax_deduction.value = '3000'
-  phone_number.value = '11012345678'
-  hourly_wage.value = '50'
-  wages.value = '20000'
-  commission_rate.value = '20'
+function test_default_employee_info(data) {
+  console.log(data)
+  employee_name.value = data.name
+  employee_type.value = data.employee_type
+  mailing_address.value = data.mailing_address
+  SSN.value = data.social_security_number
+  standard_tax_deduction.value = data.standard_tax_deduction.toString()
+  other_tax_deduction.value = (data.other_tax_deduction as number).toString()
+  phone_number.value = data.phone
+  hourly_wage.value = data.salary.toString()//时薪（小时工特有）或工资（一般员工都有
+  wages.value = data.salary.toString()
+  commission_rate.value = data.commission_rate == null ? null : data.commission_rate.toString()//佣金率（绩效员工独有）
 }
 
 function check_employee_name() {
@@ -118,6 +114,18 @@ function check_SSN() {
   return true
 }
 
+function check_standard_tax_deduction(){
+  if (standard_tax_deduction.value.length == 0) {
+    standard_tax_deduction_error.value = '请输入税率'
+    return false
+  }
+  if (isNaN(Number(standard_tax_deduction.value)) || standard_tax_deduction.value[0] == '-' || Number(standard_tax_deduction.value) > 100){
+    standard_tax_deduction_error.value = '税率输入有误'
+    return false
+  }
+  return true
+}
+
 function check_employee_info() {
   var is_no_error = true
   if (!check_employee_name()) {
@@ -133,9 +141,8 @@ function check_employee_info() {
     error_message.value = '请检查输入'
     is_no_error = false
   }
-  if (standard_tax_deduction.value.length == 0) {
+  if (!check_standard_tax_deduction()) {
     error_message.value = '请检查输入'
-    standard_tax_deduction_error.value = '请输入税率'
     is_no_error = false
   }
   if (other_tax_deduction.value.length == 0) {
@@ -166,24 +173,73 @@ function check_employee_info() {
   return is_no_error
 }
 
+axios.defaults.baseURL = '/api'
+function change_employee(data_employee_id){
+  return axios({
+    method: mode.value == 1 ? 'post' : mode.value == 2 ? 'put' : 'delete',
+    url: 'employee/change',
+    data: {
+      name: employee_name.value,
+      username: data_employee_id == null ? null : data_employee_id.value,
+      employee_type:employee_type.value,
+      mailing_address: mailing_address.value,
+      social_security_number: SSN.value,
+      standard_tax_deduction: standard_tax_deduction.value,
+      other_tax_deduction: other_tax_deduction.value,
+      salary: employee_type.value == 0 ? hourly_wage.value : wages.value,
+      phone: phone_number.value,
+      commission_rate: employee_type.value == 2 ? commission_rate.value : null
+    },
+  })
+}
+function request_employee_by_username(){
+  return axios({
+    method: 'get',
+    url: 'employee/username',
+    params: {
+      username: employee_id.value
+    }
+  })
+}
+
 function add_employee_button() {
   if (!check_employee_info()) {
     return
   }
+  change_employee(null).then(
+    (response) => {
+      if (response.data.code == 1){
+        state.value = 2
+        employee_name.value = response.data.data.username //回显用户名
+      }
+    }
+  ).catch()
 
-  state.value = 2
+  
 }
 
 function update_employee_button() {
   if (!check_employee_info()) {
     return
   }
-
-  state.value = 4
+  change_employee(employee_id).then(
+    (response) => {
+      if (response.data.code == 1){
+        state.value = 4
+      }
+    }
+  )
+  
 }
 
 function delete_employee_button() {
-  state.value = 4
+  change_employee(employee_id).then(
+    (response) => {
+      if (response.data.code == 1){
+        state.value = 4
+      }
+    }
+  )
 }
 
 function add_employee_yes_button() {
@@ -193,24 +249,40 @@ function add_employee_yes_button() {
 
 function select_employee_button() {
   if (employee_id.value.length == 0) {
-    error_message.value = '请输入员工ID'
+    error_message.value = '请输入员工用户名'
     is_error.value = true
     return
   }
+  request_employee_by_username().then(
+    (response) => {
+      if (response.data.code == 1){
+        state.value = 1
+        test_default_employee_info(response.data.data)
+      } else {
+        alert("查询用户不存在")
+      }
+    }
+  )
 
-  state.value = 1
-  test_default_employee_info()
+  
 }
 
 function select_delete_employee_button() {
   if (employee_id.value.length == 0) {
-    error_message.value = '请输入员工ID'
+    error_message.value = '请输入员工用户名'
     is_error.value = true
     return
   }
-
-  state.value = 1
-  test_default_employee_info()
+  request_employee_by_username().then(
+    (response) => {
+      if (response.data.code == 1){
+        state.value = 1
+        test_default_employee_info(response.data.data)
+      } else {
+        alert("查询用户不存在")
+      }
+    }
+  )
 }
 
 function update_employee_yes_button() {
@@ -268,7 +340,7 @@ watch(mode, (new_value, old_value) => {
         :enable="mode != 3" :error="SSN_error" @input_blur="check_SSN" />
       <BeautifulInput prompt="税率" :value="standard_tax_deduction"
         @input_update="(v) => { standard_tax_deduction = v; standard_tax_deduction_error = '' }" type="number" step="0.01"
-        :min="0" :max="99.99" symbol="%" :enable="mode != 3" :error="standard_tax_deduction_error" />
+        :min="0" :max="99.99" symbol="%" :enable="mode != 3" :error="standard_tax_deduction_error" @input_blur="check_standard_tax_deduction" />
       <BeautifulInput prompt="其他扣除" :value="other_tax_deduction"
         @input_update="(v) => { other_tax_deduction = v; other_tax_deduction_error = '' }" type="number" step="0.01"
         :min="0" symbol="元" :enable="mode != 3" :error="other_tax_deduction_error" />
@@ -291,13 +363,13 @@ watch(mode, (new_value, old_value) => {
       </DoubleBkButton>
     </FocusCard>
     <FocusCard v-else-if="state == 2">
-      <label class="prompt">员工ID为:</label>
+      <label class="prompt">员工用户名为:</label>
       <label class="id">{{ employee_name }}</label>
       <DoubleBkButton class="yes" :is_active="false" @clicked="add_employee_yes_button">确定
       </DoubleBkButton>
     </FocusCard>
     <FocusCard v-else-if="state == 3">
-      <label class="prompt">欲{{ mode == 2 ? '更新' : '删除' }}员工ID为:</label>
+      <label class="prompt">欲{{ mode == 2 ? '更新' : '删除' }}员工用户名为:</label>
       <BeautifulInput prompt="ID" :value="employee_id" @input_update="(v) => employee_id = v" />
       <DoubleBkButton class="yes" :is_active="false"
         @clicked="mode == 2 ? select_employee_button() : select_delete_employee_button()">确定
